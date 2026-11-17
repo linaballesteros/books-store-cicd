@@ -1,0 +1,18 @@
+# Normalize line endings. Keep LF inside the repository so shell scripts and
+# config files work the same on Windows, macOS, Linux and inside containers.
+* text=auto eol=lf
+
+# Shell scripts must always use LF or they break when run in Linux containers.
+*.sh text eol=lf
+
+# Windows-specific scripts keep CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary files must not be normalized.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.svg text
+*.ico binary
+*.pdf binary
