@@ -38,6 +38,7 @@ build/
 .out/
 .next/
 coverage/
+lcov.info
 
 # Local container data
 docker-data/
