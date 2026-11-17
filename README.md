@@ -110,8 +110,9 @@ versión) como medida de seguridad de cadena de suministro.
 | Nivel | Componente | Herramienta | Qué valida |
 |---|---|---|---|
 | Unitarias | Backend | `node:test` | Lógica de autenticación (JWT), errores de dominio, middleware de autenticación y validación de entrada de órdenes. |
+| Integración | Backend + PostgreSQL | `node:test` + service container | Flujo de órdenes contra una base de datos real: creación de la orden y descuento de stock, y el rechazo por stock insuficiente, cliente inexistente o libro inexistente. |
 
-Las pruebas unitarias del backend se ejecutan con:
+Las pruebas unitarias del backend no necesitan base de datos:
 
 ```bash
 cd backend
@@ -120,9 +121,17 @@ npm test
 npm run test:coverage   # con reporte de cobertura
 ```
 
+Las pruebas de integración se ejecutan contra una base de datos PostgreSQL con
+el esquema y los datos iniciales cargados. En el pipeline, esa base se levanta
+como *service container*. Se activan con la variable `RUN_DB_TESTS=1`:
+
+```bash
+RUN_DB_TESTS=1 npm run test:integration
+```
+
 ## Estado
 
-El pipeline de Integración Continua del backend está operativo (pruebas,
-cobertura, análisis con SonarCloud y build de la imagen Docker). Las pruebas de
-integración con base de datos, la Integración Continua del frontend y el
-Despliegue Continuo a AWS están en desarrollo.
+El pipeline de Integración Continua del backend está operativo: pruebas
+unitarias y de integración (contra PostgreSQL), cobertura, análisis con
+SonarCloud y build de la imagen Docker. La Integración Continua del frontend y
+el Despliegue Continuo a AWS están en desarrollo.
