@@ -15,7 +15,7 @@ import { placeOrder } from "../services/orderService.js";
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-const normalizeItems = (rawItems) => {
+export const normalizeItems = (rawItems) => {
   if (!Array.isArray(rawItems) || rawItems.length === 0) {
     throw new AppError(
       "The order must contain at least one item",
@@ -78,7 +78,7 @@ const normalizeItems = (rawItems) => {
   });
 };
 
-const normalizeOrderId = (rawOrderId) => {
+export const normalizeOrderId = (rawOrderId) => {
   if (typeof rawOrderId !== "string") {
     throw new AppError("orderId is invalid", 400, "INVALID_ORDER_ID");
   }
