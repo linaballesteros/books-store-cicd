@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   # ---------------------------------------------------------------------------
-  # Backend: unit tests, coverage and Docker image build
+  # Backend: unit tests, coverage, Docker image build and SonarCloud analysis
   # ---------------------------------------------------------------------------
   backend:
     name: backend
@@ -28,10 +28,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '24'
           cache: npm
@@ -46,11 +48,16 @@ jobs:
       - name: Generate coverage report for SonarCloud
         run: npm run test:lcov
 
+      # SonarCloud analyzes from the repository root, so the LCOV file paths
+      # must be relative to the root (prefixed with "backend/").
+      - name: Prefix coverage paths for SonarCloud
+        run: sed -i 's|^SF:|SF:backend/|' lcov.info
+
       - name: Build Docker image
         run: docker build --build-arg NODE_IMAGE=node:24-alpine -t bookstore-backend:${{ github.sha }} .
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v8
+        uses: SonarSource/sonarqube-scan-action@59202af334b4ba7b5db01b701b8e79f8b3bef0f4 # v8
         with:
           projectBaseDir: ${{ github.workspace }}
         env:
