@@ -20,11 +20,10 @@ on:
       alb_url:
         value: ${{ jobs.deploy.outputs.alb_url }}
 
-permissions:
-  contents: read
-
 jobs:
   deploy:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment: ${{ inputs.workspace }}

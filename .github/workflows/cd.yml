@@ -12,9 +12,7 @@ on:
         required: true
         type: string
 
-permissions:
-  actions: read
-  contents: read
+permissions: {}
 
 concurrency:
   group: bookstore-deployment
@@ -22,6 +20,9 @@ concurrency:
 
 jobs:
   release:
+    permissions:
+      actions: read
+      contents: read
     if: >-
       github.ref == 'refs/heads/main' &&
       (github.event_name == 'workflow_dispatch' ||
@@ -44,6 +45,8 @@ jobs:
 
   deploy-staging:
     needs: release
+    permissions:
+      contents: read
     uses: ./.github/workflows/deploy-environment.yml
     with:
       workspace: staging
@@ -52,6 +55,8 @@ jobs:
 
   smoke-staging:
     needs: deploy-staging
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -64,6 +69,8 @@ jobs:
 
   deploy-production:
     needs: [release, smoke-staging]
+    permissions:
+      contents: read
     uses: ./.github/workflows/deploy-environment.yml
     with:
       workspace: production
@@ -72,6 +79,8 @@ jobs:
 
   smoke-production:
     needs: deploy-production
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
