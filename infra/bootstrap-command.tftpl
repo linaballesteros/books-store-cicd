@@ -1,0 +1,8 @@
+work_dir=$(mktemp -d)
+mkdir -p "$work_dir/rds"
+%{ for name, contents in files ~}
+cat > "$work_dir/${name}" <<'BOOKSTORE_FILE_END'
+${chomp(contents)}
+BOOKSTORE_FILE_END
+%{ endfor ~}
+exec bash "$work_dir/rds/bootstrap.sh"

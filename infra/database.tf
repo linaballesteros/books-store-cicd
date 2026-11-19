@@ -18,6 +18,7 @@ variable "db_admin_password_version" {
 
 locals {
   db_port       = 5432
+  db_app_user   = "bookstore_app"
   is_production = local.environment == "production"
 }
 
