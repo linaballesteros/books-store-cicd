@@ -1,0 +1,83 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      ci_run_id:
+        description: Run ID of the latest successful CI publication on main
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: bookstore-deployment
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      (github.event.workflow_run.event == 'push' || github.event.workflow_run.event == 'workflow_dispatch')))
+    runs-on: ubuntu-latest
+    outputs:
+      release_images: ${{ steps.resolve.outputs.release_images }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Verify and read the release manifest
+        id: resolve
+        env:
+          CI_RUN_ID: ${{ github.event.workflow_run.id || inputs.ci_run_id }}
+          GH_TOKEN: ${{ github.token }}
+        run: python3 infra/resolve-release.py
+
+  deploy-staging:
+    needs: release
+    uses: ./.github/workflows/deploy-environment.yml
+    with:
+      workspace: staging
+      release_images: ${{ needs.release.outputs.release_images }}
+    secrets: inherit
+
+  smoke-staging:
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Verify staging through its ALB
+        env:
+          ALB_URL: ${{ needs.deploy-staging.outputs.alb_url }}
+        run: python3 infra/smoke-test.py "$ALB_URL"
+
+  deploy-production:
+    needs: [release, smoke-staging]
+    uses: ./.github/workflows/deploy-environment.yml
+    with:
+      workspace: production
+      release_images: ${{ needs.release.outputs.release_images }}
+    secrets: inherit
+
+  smoke-production:
+    needs: deploy-production
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Verify production through its ALB
+        env:
+          ALB_URL: ${{ needs.deploy-production.outputs.alb_url }}
+        run: python3 infra/smoke-test.py "$ALB_URL"
