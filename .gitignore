@@ -40,6 +40,9 @@ build/
 .next/
 coverage/
 lcov.info
+/.coverage
+/infra/coverage.xml
+/infra/**/__pycache__/
 frontend/test-results/
 
 # Local container data

@@ -167,7 +167,7 @@ jobs:
           DB_PASSWORD: test_password
         run: npm run test:integration
 
-  # A single analysis receives both reports; separate scans would overwrite
+  # A single analysis receives the reports; separate scans would overwrite
   # each other's coverage in the same SonarCloud project.
   sonar:
     name: sonar
@@ -188,6 +188,16 @@ jobs:
         with:
           name: coverage-frontend
           path: frontend
+      - name: Test deployment scripts and generate Python coverage
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          python3 -m venv "$RUNNER_TEMP/infra-coverage"
+          python="$RUNNER_TEMP/infra-coverage/bin/python"
+          "$python" -m pip install 'coverage==7.10.7'
+          "$python" -m coverage run --branch --source=infra --omit='infra/tests/*' \
+            -m unittest discover -s infra/tests
+          "$python" -m coverage xml -o infra/coverage.xml
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@59202af334b4ba7b5db01b701b8e79f8b3bef0f4 # v8
         with:
