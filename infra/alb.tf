@@ -6,7 +6,7 @@ resource "aws_lb" "app" {
   subnets            = data.aws_subnets.public.ids
 
   access_logs {
-    bucket  = aws_s3_bucket.alb_logs.id
+    bucket  = local.alb_log_bucket
     enabled = true
   }
 
@@ -14,6 +14,7 @@ resource "aws_lb" "app" {
     aws_apigatewayv2_stage.app,
     aws_apigatewayv2_vpc_link.app,
     aws_s3_bucket_policy.alb_logs,
+    aws_s3_bucket_public_access_block.alb_logs,
     aws_s3_bucket_server_side_encryption_configuration.alb_logs,
   ]
 

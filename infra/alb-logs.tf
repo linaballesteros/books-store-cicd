@@ -1,11 +1,12 @@
 data "aws_caller_identity" "current" {}
 
-resource "aws_s3_bucket" "alb_logs" {
-  bucket_prefix = "${local.name_prefix}-alb-logs-"
+locals {
+  alb_log_bucket     = "${local.name_prefix}-${data.aws_caller_identity.current.account_id}-alb-logs"
+  alb_log_bucket_arn = "arn:aws:s3:::${local.alb_log_bucket}"
 }
 
 resource "aws_s3_bucket_public_access_block" "alb_logs" {
-  bucket                  = aws_s3_bucket.alb_logs.id
+  bucket                  = local.alb_log_bucket
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -13,7 +14,7 @@ resource "aws_s3_bucket_public_access_block" "alb_logs" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "alb_logs" {
-  bucket = aws_s3_bucket.alb_logs.id
+  bucket = local.alb_log_bucket
 
   rule {
     apply_server_side_encryption_by_default {
@@ -23,7 +24,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "alb_logs" {
 }
 
 resource "aws_s3_bucket_policy" "alb_logs" {
-  bucket = aws_s3_bucket.alb_logs.id
+  bucket = local.alb_log_bucket
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -32,14 +33,14 @@ resource "aws_s3_bucket_policy" "alb_logs" {
         Effect    = "Allow"
         Principal = { Service = "logdelivery.elasticloadbalancing.amazonaws.com" }
         Action    = "s3:PutObject"
-        Resource  = "${aws_s3_bucket.alb_logs.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"
+        Resource  = "${local.alb_log_bucket_arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"
       },
       {
         Sid       = "RequireSecureTransport"
         Effect    = "Deny"
         Principal = "*"
         Action    = "s3:*"
-        Resource  = [aws_s3_bucket.alb_logs.arn, "${aws_s3_bucket.alb_logs.arn}/*"]
+        Resource  = [local.alb_log_bucket_arn, "${local.alb_log_bucket_arn}/*"]
         Condition = { Bool = { "aws:SecureTransport" = "false", "aws:PrincipalIsAWSService" = "false" } }
       },
     ]
