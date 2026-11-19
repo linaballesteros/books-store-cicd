@@ -6,6 +6,7 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Environment and secrets
+/.aws/
 .env
 .env.*
 !.env.example
@@ -50,6 +51,12 @@ compose.override.yaml
 
 # RDS bootstrap credentials
 database/rds/bootstrap.env
+
+# Terraform working data and local state
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
 
 # Course documents (kept outside the repository)
 docs/
