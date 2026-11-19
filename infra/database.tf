@@ -70,6 +70,9 @@ resource "aws_db_instance" "database" {
   backup_retention_period    = local.is_production ? 7 : 1
   skip_final_snapshot        = !local.is_production
   final_snapshot_identifier  = local.is_production ? "${local.name_prefix}-db-final" : null
+
+  # Keep the initial password retrievable even if provisioning is interrupted.
+  depends_on = [aws_ssm_parameter.db_admin_password]
 }
 
 output "db_host" {
