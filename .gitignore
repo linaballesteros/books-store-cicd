@@ -39,6 +39,7 @@ build/
 .next/
 coverage/
 lcov.info
+frontend/test-results/
 
 # Local container data
 docker-data/

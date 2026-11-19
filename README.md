@@ -17,7 +17,7 @@ las pruebas, la infraestructura como código y la estrategia de despliegue.
 | Nombre | Usuario de GitHub |
 |---|---|
 | Lina Sofía Ballesteros | [@linaballesteros](https://github.com/linaballesteros) |
-| Quinnie Nastasja Villareal | [@quinnie9](https://github.com/quinnie9) |
+| Quinnie Nastasja Villarreal Aragon | [@quinnie9](https://github.com/quinnie9) |
 | Alejandro Ríos Muñoz | [@alejoriosm04](https://github.com/alejoriosm04) |
 
 Propietaria del repositorio: [@linaballesteros](https://github.com/linaballesteros).
@@ -79,8 +79,10 @@ herramientas por etapa:
 | Control de versiones y disparo | Git + GitHub Actions |
 | Build / dependencias | Node.js 24, npm |
 | Pruebas unitarias y cobertura | `node:test` (runner nativo de Node) |
+| Pruebas de componente del frontend | Vitest + Testing Library, con entorno jsdom |
 | Análisis estático y Quality Gate | SonarCloud |
 | Empaquetado (artefacto) | Docker |
+| Publicación multiplataforma | Docker Buildx + QEMU + Docker Hub |
 
 ### Integración de la estrategia con el pipeline
 
@@ -105,12 +107,38 @@ lógica con pruebas; la configuración está en `sonar-project.properties`.
 Las GitHub Actions se referencian por **SHA de commit** (no por etiqueta de
 versión) como medida de seguridad de cadena de suministro.
 
+El frontend y el backend se validan en paralelo. El job `sonar` espera sus dos
+reportes LCOV y el resultado de integración, y ejecuta un único análisis para
+evitar que una ejecución sobrescriba la cobertura de la otra. Los PR no publican
+imágenes. En `main`, tras pasar todos los controles, `publish-backend` y
+`publish-frontend` publican imágenes para `linux/amd64` y `linux/arm64` y verifican
+las dos arquitecturas en el manifiesto del registro.
+
+### Configuración de publicación
+
+La propietaria configura en **Settings → Secrets and variables → Actions**:
+
+- Variable `DOCKERHUB_USERNAME`: cuenta o namespace que alojará ambas imágenes.
+- Secreto `DOCKERHUB_TOKEN`: token con permiso de escritura en ese namespace.
+- Se mantienen `SONAR_TOKEN` y `SONAR_HOST_URL` del análisis existente.
+
+Los nombres publicados son `<namespace>/bookstore-backend:<sha>` y
+`<namespace>/bookstore-frontend:<sha>`. El artefacto `release-manifest` contiene
+`release.json` con el commit, los digests exactos y las plataformas de ambas
+imágenes. CD debe consumir esos digests para promover la misma pareja de
+artefactos a Staging y Producción. Si falla una publicación, no se genera la
+release conjunta.
+
+Al incorporar estos jobs, actualizar los checks obligatorios del ruleset para
+incluir `frontend`, `backend-integration` y `sonar`, además de `backend`.
+
 ## Pruebas
 
 | Nivel | Componente | Herramienta | Qué valida |
 |---|---|---|---|
 | Unitarias | Backend | `node:test` | Lógica de autenticación (JWT), errores de dominio, middleware de autenticación y validación de entrada de órdenes. |
 | Integración | Backend + PostgreSQL | `node:test` + service container | Flujo de órdenes contra una base de datos real: creación de la orden y descuento de stock, y el rechazo por stock insuficiente, cliente inexistente o libro inexistente. |
+| Unitarias y de componente | Frontend | Vitest + Testing Library | Carrito e inventario disponible, aislamiento entre clientes, contratos de API, errores, formato, inicio de sesión, compra y protección de rutas. |
 
 Las pruebas unitarias del backend no necesitan base de datos:
 
@@ -129,9 +157,30 @@ como *service container*. Se activan con la variable `RUN_DB_TESTS=1`:
 RUN_DB_TESTS=1 npm run test:integration
 ```
 
+Las pruebas del frontend no necesitan AWS ni una base de datos. Se ejecutan con
+Node.js 24:
+
+```bash
+cd frontend
+npm ci --ignore-scripts
+npm run lint
+npm run test:coverage
+```
+
+El umbral es 80% en líneas, sentencias, funciones y ramas del alcance definido
+en `frontend/vitest.config.js`. Se miden la lógica del carrito, servicios de
+cliente, errores, formato, hooks de sesión/carrito y los componentes Login,
+CartScreen y ProtectedRoute. No representa cobertura de todas las pantallas
+heredadas. El reporte HTML queda en `frontend/coverage/index.html`; el LCOV
+se integra con el backend en SonarCloud.
+
+Para compilar sin Docker, configurar las variables de
+`frontend/.env.example` antes de ejecutar `npm run build`.
+
 ## Estado
 
-El pipeline de Integración Continua del backend está operativo: pruebas
-unitarias y de integración (contra PostgreSQL), cobertura, análisis con
-SonarCloud y build de la imagen Docker. La Integración Continua del frontend y
-el Despliegue Continuo a AWS están en desarrollo.
+El backend conserva sus pruebas unitarias y de integración con PostgreSQL.
+La contribución del frontend añade su suite, lint, build, cobertura conjunta en
+SonarCloud y publicación de ambas imágenes en Docker Hub. La primera publicación
+requiere la variable y el secreto descritos arriba. El Despliegue Continuo a AWS
+se desarrolla en el frente de infraestructura del equipo.
