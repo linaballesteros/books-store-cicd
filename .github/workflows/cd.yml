@@ -62,10 +62,10 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
-      - name: Verify staging through its ALB
+      - name: Verify staging through its HTTPS endpoint
         env:
-          ALB_URL: ${{ needs.deploy-staging.outputs.alb_url }}
-        run: python3 infra/smoke-test.py "$ALB_URL"
+          APPLICATION_URL: ${{ needs.deploy-staging.outputs.application_url }}
+        run: python3 infra/smoke-test.py "$APPLICATION_URL"
 
   deploy-production:
     needs: [release, smoke-staging]
@@ -86,7 +86,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
-      - name: Verify production through its ALB
+      - name: Verify production through its HTTPS endpoint
         env:
-          ALB_URL: ${{ needs.deploy-production.outputs.alb_url }}
-        run: python3 infra/smoke-test.py "$ALB_URL"
+          APPLICATION_URL: ${{ needs.deploy-production.outputs.application_url }}
+        run: python3 infra/smoke-test.py "$APPLICATION_URL"

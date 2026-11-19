@@ -17,8 +17,8 @@ on:
       AWS_SESSION_TOKEN:
         required: true
     outputs:
-      alb_url:
-        value: ${{ jobs.deploy.outputs.alb_url }}
+      application_url:
+        value: ${{ jobs.deploy.outputs.application_url }}
 
 jobs:
   deploy:
@@ -28,7 +28,7 @@ jobs:
     timeout-minutes: 45
     environment: ${{ inputs.workspace }}
     outputs:
-      alb_url: ${{ steps.activate.outputs.alb_url }}
+      application_url: ${{ steps.activate.outputs.application_url }}
     env:
       AWS_REGION: us-east-1
       AWS_DEFAULT_REGION: us-east-1
@@ -71,4 +71,4 @@ jobs:
         id: activate
         run: |
           bash infra/deploy-app.sh
-          printf 'alb_url=%s\n' "$(terraform -chdir=infra output -raw alb_url)" >> "$GITHUB_OUTPUT"
+          printf 'application_url=%s\n' "$(terraform -chdir=infra output -raw application_url)" >> "$GITHUB_OUTPUT"

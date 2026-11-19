@@ -47,7 +47,7 @@ locals {
     SERVICE_NAME                 = "${local.name_prefix}-api"
     PORT                         = tostring(local.backend_port)
     API_BASE_PATH                = local.api_prefix
-    CORS_ORIGINS                 = "http://${aws_lb.app.dns_name}"
+    CORS_ORIGINS                 = aws_apigatewayv2_api.app.api_endpoint
     BOOKS_DEFAULT_LIMIT          = "24"
     BOOKS_MAX_LIMIT              = "100"
     ORDERS_MAX_DISTINCT_ITEMS    = "100"
@@ -74,7 +74,7 @@ locals {
     AUTH_JWT_AUDIENCE            = "bookstore-web"
     AUTH_TOKEN_TTL_SECONDS       = "28800"
     AUTH_COOKIE_NAME             = "bookstore_session"
-    AUTH_COOKIE_SECURE           = "false"
+    AUTH_COOKIE_SECURE           = "true"
     AUTH_COOKIE_SAME_SITE        = "lax"
     AUTH_COOKIE_PATH             = local.api_prefix
   }

@@ -36,7 +36,7 @@ def check_catalog(base_url):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run BookStore smoke tests through its load balancer.")
+    parser = argparse.ArgumentParser(description="Run BookStore smoke tests through its public endpoint.")
     parser.add_argument("base_url", help="Base URL of the deployed environment")
     base_url = parser.parse_args().base_url.rstrip("/")
 
