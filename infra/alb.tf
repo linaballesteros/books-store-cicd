@@ -4,6 +4,13 @@ resource "aws_lb" "app" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
   subnets            = data.aws_subnets.public.ids
+
+  access_logs {
+    bucket  = aws_s3_bucket.alb_logs.id
+    enabled = true
+  }
+
+  depends_on = [aws_s3_bucket_policy.alb_logs, aws_s3_bucket_server_side_encryption_configuration.alb_logs]
 }
 
 resource "aws_lb_target_group" "frontend" {
