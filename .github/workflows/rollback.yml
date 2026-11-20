@@ -1,0 +1,36 @@
+name: Panic rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      workspace:
+        description: Environment to restore
+        required: true
+        type: choice
+        options: [staging, production]
+
+permissions: {}
+
+concurrency:
+  group: bookstore-deployment
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: ${{ inputs.workspace }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Restore and verify a previously validated revision
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          TF_WORKSPACE: ${{ inputs.workspace }}
+        run: bash infra/release-health.sh rollback
