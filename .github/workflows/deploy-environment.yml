@@ -19,6 +19,8 @@ on:
     outputs:
       application_url:
         value: ${{ jobs.deploy.outputs.application_url }}
+      revision:
+        value: ${{ jobs.deploy.outputs.revision }}
 
 jobs:
   deploy:
@@ -29,6 +31,7 @@ jobs:
     environment: ${{ inputs.workspace }}
     outputs:
       application_url: ${{ steps.activate.outputs.application_url }}
+      revision: ${{ steps.activate.outputs.revision }}
     env:
       AWS_REGION: us-east-1
       AWS_DEFAULT_REGION: us-east-1
@@ -74,3 +77,4 @@ jobs:
         run: |
           bash infra/deploy-app.sh
           printf 'application_url=%s\n' "$(terraform -chdir=infra output -raw application_url)" >> "$GITHUB_OUTPUT"
+          printf 'revision=%s\n' "$(terraform -chdir=infra output -raw app_task_definition_arn)" >> "$GITHUB_OUTPUT"

@@ -64,8 +64,13 @@ jobs:
           persist-credentials: false
       - name: Verify staging through its HTTPS endpoint
         env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          TF_WORKSPACE: staging
           APPLICATION_URL: ${{ needs.deploy-staging.outputs.application_url }}
-        run: python3 infra/smoke-test.py "$APPLICATION_URL"
+          EXPECTED_REVISION: ${{ needs.deploy-staging.outputs.revision }}
+        run: bash infra/release-health.sh verify "$EXPECTED_REVISION"
 
   deploy-production:
     needs: [release, smoke-staging]
@@ -88,5 +93,10 @@ jobs:
           persist-credentials: false
       - name: Verify production through its HTTPS endpoint
         env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          TF_WORKSPACE: production
           APPLICATION_URL: ${{ needs.deploy-production.outputs.application_url }}
-        run: python3 infra/smoke-test.py "$APPLICATION_URL"
+          EXPECTED_REVISION: ${{ needs.deploy-production.outputs.revision }}
+        run: bash infra/release-health.sh verify "$EXPECTED_REVISION"
