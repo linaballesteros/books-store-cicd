@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "install:browser": "playwright install --with-deps --only-shell chromium",
     "test": "playwright test"
   },
   "devDependencies": {

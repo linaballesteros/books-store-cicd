@@ -46,7 +46,8 @@ test("buys a staging book and finds the same order in purchase history", async (
 
   await expect(page.getByText("Tu compra fue registrada correctamente.")).toBeVisible();
   const orderId = new URL(page.url()).pathname.split("/")[2];
-  await page.getByRole("link", { name: "Ver mis compras" }).click();
+  await page.getByText("Ver mis compras", { exact: true }).click();
+  await expect(page).toHaveURL(/\/orders$/);
   await expect(page.getByRole("heading", { name: "Mis compras" })).toBeVisible();
   const order = page.getByRole("button", { name: new RegExp(orderId) });
   await expect(order).toBeVisible();

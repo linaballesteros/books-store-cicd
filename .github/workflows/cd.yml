@@ -72,7 +72,7 @@ jobs:
         working-directory: infra/e2e
         run: |
           npm ci --ignore-scripts
-          npx playwright install --with-deps --only-shell chromium
+          npm run install:browser
       - name: Verify staging and exercise a purchase in Chromium
         if: ${{ !cancelled() }}
         env:
