@@ -70,6 +70,7 @@ jobs:
       - name: Provision AWS infrastructure and register the release
         env:
           TF_VAR_release_images: ${{ inputs.release_images }}
+          TF_VAR_api_alarm_topic_arn: ${{ vars.BOOKSTORE_ALARM_TOPIC_ARN }}
         run: |
           bash infra/ensure-log-bucket.sh
           python3 infra/apply-release.py
