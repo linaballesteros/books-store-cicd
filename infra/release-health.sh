@@ -33,17 +33,6 @@ smoke() {
   python3 "$infra_dir/smoke-test.py" "$application_url"
 }
 
-verify_candidate() {
-  smoke || return
-  if [[ "${1:-}" == "acceptance" ]]; then
-    if [[ "${ACCEPTANCE_BROWSER_STATUS:-success}" != "success" ]]; then
-      printf 'The acceptance browser failed to install.\n' >&2
-      return 1
-    fi
-    npm --prefix "$infra_dir/e2e" test
-  fi
-}
-
 application_url=${APPLICATION_URL:-}
 if [[ -z "$application_url" ]]; then
   application_url=$(aws apigatewayv2 get-apis --region "$region" --no-cli-pager \
@@ -61,40 +50,57 @@ if [[ "$active" == "$last_good" ]]; then
   target=$previous_good
   remaining=
 fi
+
+require_candidate() {
+  local candidate=$1
+  if [[ "$active" != "$candidate" ]]; then
+    printf 'Expected candidate %s but found %s\n' "$candidate" "$active" >&2
+    exit 1
+  fi
+}
+
+record_candidate() {
+  if [[ "$active" != "$last_good" ]]; then
+    record_revision "$active" "$last_good"
+  fi
+}
+
+restore_target() {
+  if [[ -z "$target" ]]; then
+    printf 'There is no different validated revision to restore.\n' >&2
+    return 1
+  fi
+  activate_revision "$target"
+  smoke
+}
+
+recover_candidate() {
+  printf 'Release validation failed.\n' >&2
+  restore_target
+  if [[ "$active" == "$last_good" ]]; then
+    record_revision "$target" "$remaining"
+  fi
+  printf 'Recovery smoke tests passed. The candidate still failed validation.\n'
+}
+
 case "${1:-}" in
+  record) require_candidate "${2:?Expected ECS task definition ARN}"; record_candidate ;;
+  recover) require_candidate "${2:?Expected ECS task definition ARN}"; recover_candidate ;;
   verify)
-    candidate=${2:?Expected ECS task definition ARN}
-    if [[ "$active" != "$candidate" ]]; then
-      printf 'Expected candidate %s but found %s\n' "$candidate" "$active" >&2
-      exit 1
-    fi
-    if verify_candidate "${3:-}"; then
-      if [[ "$active" != "$last_good" ]]; then
-        record_revision "$active" "$last_good"
-      fi
+    require_candidate "${2:?Expected ECS task definition ARN}"
+    if smoke; then
+      record_candidate
     else
-      if [[ -z "$target" ]]; then
-        printf 'Release validation failed and there is no different validated revision to restore.\n' >&2
-      else
-        printf 'Release validation failed. Restoring %s.\n' "$target" >&2
-        activate_revision "$target"
-        smoke
-        if [[ "$active" == "$last_good" ]]; then
-          record_revision "$target" "$remaining"
-        fi
-        printf 'Recovery smoke tests passed. The candidate still failed validation.\n'
-      fi
+      recover_candidate
       exit 1
     fi
     ;;
   rollback)
-    if [[ -z "$target" ]]; then
-      printf 'There is no different validated revision to restore.\n' >&2
-      exit 1
-    fi
-    activate_revision "$target"
-    smoke
+    restore_target
     record_revision "$target" "$remaining"
+    if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+      printf 'application_url=%s\n' "$application_url" >> "$GITHUB_OUTPUT"
+    fi
     ;;
-  *) printf 'Use verify <task-definition-arn> or rollback.\n' >&2; exit 1 ;;
+  *) printf 'Use verify, record or recover <task-definition-arn>, or rollback.\n' >&2; exit 1 ;;
 esac

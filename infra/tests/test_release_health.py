@@ -49,21 +49,8 @@ state_file.write_text(json.dumps(state))
 raise SystemExit(int(state["active"] == state["unhealthy"]))
 """
 
-NPM_STUB = """#!/usr/bin/env python3
-import json
-import os
-from pathlib import Path
-
-state_file = Path(os.environ["TEST_STATE"])
-state = json.loads(state_file.read_text())
-state["acceptance_runs"] += 1
-state_file.write_text(json.dumps(state))
-raise SystemExit(state["acceptance_exit"])
-"""
-
-
 class ReleaseHealthTests(unittest.TestCase):
-    def run_health(self, *args, active, history="", unhealthy="", endpoint=ENDPOINT, acceptance_exit=0):
+    def run_health(self, *args, active, history="", unhealthy="", endpoint=ENDPOINT):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory)
             for script in ("release-health.sh", "ecs-service.sh"):
@@ -72,20 +59,18 @@ class ReleaseHealthTests(unittest.TestCase):
             aws = path / "aws"
             aws.write_text(AWS_STUB)
             aws.chmod(0o755)
-            npm = path / "npm"
-            npm.write_text(NPM_STUB)
-            npm.chmod(0o755)
             state = path / "state.json"
+            output = path / "output.txt"
+            output.touch()
             state.write_text(json.dumps(dict(active=active, history=history, unhealthy=unhealthy,
-                                             endpoint=endpoint, updates=[], checks=[],
-                                             acceptance_runs=0, acceptance_exit=acceptance_exit)))
+                                             endpoint=endpoint, updates=[], checks=[])))
             env = dict(os.environ, PATH=f"{path}:{os.environ['PATH']}", TF_WORKSPACE="staging",
-                       TEST_STATE=str(state), APPLICATION_URL="", ACCEPTANCE_BROWSER_STATUS="success")
+                       TEST_STATE=str(state), APPLICATION_URL="", GITHUB_OUTPUT=str(output))
             result = subprocess.run(
                 ["bash", str(path / "release-health.sh"), *args],
                 env=env, text=True, capture_output=True, check=False,
             )
-            return result, json.loads(state.read_text())
+            return result, {**json.loads(state.read_text()), "outputs": output.read_text()}
 
     def test_success_records_candidate_and_keeps_previous(self):
         result, state = self.run_health("verify", SECOND, active=SECOND, history=FIRST)
@@ -105,14 +90,18 @@ class ReleaseHealthTests(unittest.TestCase):
         self.assertEqual(state["checks"], [[SECOND, ENDPOINT], [FIRST, ENDPOINT]])
         self.assertEqual(state["history"], FIRST)
 
-    def test_failed_acceptance_restores_baseline_with_read_only_recovery(self):
-        result, state = self.run_health("verify", SECOND, "acceptance", active=SECOND, history=FIRST,
-                                        acceptance_exit=1)
-        self.assertEqual(result.returncode, 1)
-        self.assertEqual(state["acceptance_runs"], 1)
+    def test_recovery_step_checks_only_the_restored_revision(self):
+        result, state = self.run_health("recover", SECOND, active=SECOND, history=FIRST)
+        self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(state["updates"], [FIRST])
-        self.assertEqual(state["checks"], [[SECOND, ENDPOINT], [FIRST, ENDPOINT]])
+        self.assertEqual(state["checks"], [[FIRST, ENDPOINT]])
         self.assertEqual(state["history"], FIRST)
+
+    def test_record_step_saves_candidate_after_external_checks(self):
+        result, state = self.run_health("record", SECOND, active=SECOND, history=FIRST)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(state["history"], f"{SECOND},{FIRST}")
+        self.assertEqual(state["checks"], [])
 
     def test_first_failed_deployment_reports_no_baseline(self):
         result, state = self.run_health("verify", FIRST, active=FIRST, unhealthy=FIRST)
@@ -132,6 +121,7 @@ class ReleaseHealthTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(state["updates"], [FIRST])
         self.assertEqual(state["history"], FIRST)
+        self.assertEqual(state["outputs"], f"application_url={ENDPOINT}\n")
 
     def test_manual_rollback_chooses_last_validated_if_active_is_unverified(self):
         result, state = self.run_health("rollback", active=SECOND, history=FIRST)
