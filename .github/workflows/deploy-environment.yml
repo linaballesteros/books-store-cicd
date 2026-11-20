@@ -21,6 +21,8 @@ on:
         value: ${{ jobs.deploy.outputs.application_url }}
       revision:
         value: ${{ jobs.deploy.outputs.revision }}
+      bootstrap_task:
+        value: ${{ jobs.deploy.outputs.bootstrap_task }}
 
 jobs:
   deploy:
@@ -32,6 +34,7 @@ jobs:
     outputs:
       application_url: ${{ steps.activate.outputs.application_url }}
       revision: ${{ steps.activate.outputs.revision }}
+      bootstrap_task: ${{ steps.activate.outputs.bootstrap_task }}
     env:
       AWS_REGION: us-east-1
       AWS_DEFAULT_REGION: us-east-1
@@ -78,3 +81,7 @@ jobs:
           bash infra/deploy-app.sh
           printf 'application_url=%s\n' "$(terraform -chdir=infra output -raw application_url)" >> "$GITHUB_OUTPUT"
           printf 'revision=%s\n' "$(terraform -chdir=infra output -raw app_task_definition_arn)" >> "$GITHUB_OUTPUT"
+          if [[ "$TF_WORKSPACE" == staging ]]; then
+            task=$(terraform -chdir=infra output -json bootstrap_task | python3 -c 'import json, sys; print(json.dumps(json.load(sys.stdin)))')
+            printf 'bootstrap_task=%s\n' "$task" >> "$GITHUB_OUTPUT"
+          fi

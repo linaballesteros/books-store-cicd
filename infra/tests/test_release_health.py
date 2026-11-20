@@ -49,9 +49,21 @@ state_file.write_text(json.dumps(state))
 raise SystemExit(int(state["active"] == state["unhealthy"]))
 """
 
+NPM_STUB = """#!/usr/bin/env python3
+import json
+import os
+from pathlib import Path
+
+state_file = Path(os.environ["TEST_STATE"])
+state = json.loads(state_file.read_text())
+state["acceptance_runs"] += 1
+state_file.write_text(json.dumps(state))
+raise SystemExit(state["acceptance_exit"])
+"""
+
 
 class ReleaseHealthTests(unittest.TestCase):
-    def run_health(self, *args, active, history="", unhealthy="", endpoint=ENDPOINT):
+    def run_health(self, *args, active, history="", unhealthy="", endpoint=ENDPOINT, acceptance_exit=0):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory)
             for script in ("release-health.sh", "ecs-service.sh"):
@@ -60,11 +72,15 @@ class ReleaseHealthTests(unittest.TestCase):
             aws = path / "aws"
             aws.write_text(AWS_STUB)
             aws.chmod(0o755)
+            npm = path / "npm"
+            npm.write_text(NPM_STUB)
+            npm.chmod(0o755)
             state = path / "state.json"
             state.write_text(json.dumps(dict(active=active, history=history, unhealthy=unhealthy,
-                                             endpoint=endpoint, updates=[], checks=[])))
+                                             endpoint=endpoint, updates=[], checks=[],
+                                             acceptance_runs=0, acceptance_exit=acceptance_exit)))
             env = dict(os.environ, PATH=f"{path}:{os.environ['PATH']}", TF_WORKSPACE="staging",
-                       TEST_STATE=str(state), APPLICATION_URL="")
+                       TEST_STATE=str(state), APPLICATION_URL="", ACCEPTANCE_BROWSER_STATUS="success")
             result = subprocess.run(
                 ["bash", str(path / "release-health.sh"), *args],
                 env=env, text=True, capture_output=True, check=False,
@@ -85,6 +101,15 @@ class ReleaseHealthTests(unittest.TestCase):
     def test_failed_candidate_restores_baseline_and_keeps_job_red(self):
         result, state = self.run_health("verify", SECOND, active=SECOND, history=FIRST, unhealthy=SECOND)
         self.assertEqual(result.returncode, 1)
+        self.assertEqual(state["updates"], [FIRST])
+        self.assertEqual(state["checks"], [[SECOND, ENDPOINT], [FIRST, ENDPOINT]])
+        self.assertEqual(state["history"], FIRST)
+
+    def test_failed_acceptance_restores_baseline_with_read_only_recovery(self):
+        result, state = self.run_health("verify", SECOND, "acceptance", active=SECOND, history=FIRST,
+                                        acceptance_exit=1)
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(state["acceptance_runs"], 1)
         self.assertEqual(state["updates"], [FIRST])
         self.assertEqual(state["checks"], [[SECOND, ENDPOINT], [FIRST, ENDPOINT]])
         self.assertEqual(state["history"], FIRST)

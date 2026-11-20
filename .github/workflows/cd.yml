@@ -62,7 +62,19 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
-      - name: Verify staging through its HTTPS endpoint
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: infra/e2e/package-lock.json
+      - name: Install the acceptance browser
+        id: browser
+        working-directory: infra/e2e
+        run: |
+          npm ci --ignore-scripts
+          npx playwright install --with-deps --only-shell chromium
+      - name: Verify staging and exercise a purchase in Chromium
+        if: ${{ !cancelled() }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -70,7 +82,17 @@ jobs:
           TF_WORKSPACE: staging
           APPLICATION_URL: ${{ needs.deploy-staging.outputs.application_url }}
           EXPECTED_REVISION: ${{ needs.deploy-staging.outputs.revision }}
-        run: bash infra/release-health.sh verify "$EXPECTED_REVISION"
+          BOOTSTRAP_TASK: ${{ needs.deploy-staging.outputs.bootstrap_task }}
+          ACCEPTANCE_BROWSER_STATUS: ${{ steps.browser.outcome }}
+        run: bash infra/release-health.sh verify "$EXPECTED_REVISION" acceptance
+      - name: Preserve the staging acceptance report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: staging-acceptance-report
+          path: infra/e2e/playwright-report/
+          retention-days: 7
+          if-no-files-found: ignore
 
   deploy-production:
     needs: [release, smoke-staging]

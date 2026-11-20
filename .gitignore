@@ -42,6 +42,8 @@ coverage/
 lcov.info
 /.coverage
 /infra/coverage.xml
+/infra/e2e/playwright-report/
+/infra/e2e/test-results/
 /infra/**/__pycache__/
 frontend/test-results/
 
