@@ -30,7 +30,9 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    environment: ${{ inputs.workspace }}
+    environment:
+      name: ${{ inputs.workspace }}
+      url: ${{ steps.activate.outputs.application_url }}
     outputs:
       application_url: ${{ steps.activate.outputs.application_url }}
       revision: ${{ steps.activate.outputs.revision }}
