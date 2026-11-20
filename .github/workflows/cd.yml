@@ -58,11 +58,19 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
+    env:
+      TF_WORKSPACE: staging
+      APPLICATION_URL: ${{ needs.deploy-staging.outputs.application_url }}
+      EXPECTED_REVISION: ${{ needs.deploy-staging.outputs.revision }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+      - name: Smoke test staging over HTTPS
+        id: smoke
+        run: python3 infra/smoke-test.py "$APPLICATION_URL"
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        id: node
         with:
           node-version: '24'
           cache: npm
@@ -73,18 +81,29 @@ jobs:
         run: |
           npm ci --ignore-scripts
           npm run install:browser
-      - name: Verify staging and exercise a purchase in Chromium
-        if: ${{ !cancelled() }}
+      - name: Acceptance test the purchase in Chromium
+        id: acceptance
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-          TF_WORKSPACE: staging
-          APPLICATION_URL: ${{ needs.deploy-staging.outputs.application_url }}
-          EXPECTED_REVISION: ${{ needs.deploy-staging.outputs.revision }}
           BOOTSTRAP_TASK: ${{ needs.deploy-staging.outputs.bootstrap_task }}
-          ACCEPTANCE_BROWSER_STATUS: ${{ steps.browser.outcome }}
-        run: bash infra/release-health.sh verify "$EXPECTED_REVISION" acceptance
+        run: npm --prefix infra/e2e test
+      - name: Record the validated staging revision
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        run: bash infra/release-health.sh record "$EXPECTED_REVISION"
+      - name: Roll back staging after failed validation
+        if: >-
+          failure() && (steps.smoke.outcome == 'failure' || steps.node.outcome == 'failure' ||
+          steps.browser.outcome == 'failure' || steps.acceptance.outcome == 'failure')
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        run: bash infra/release-health.sh recover "$EXPECTED_REVISION"
       - name: Preserve the staging acceptance report
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
