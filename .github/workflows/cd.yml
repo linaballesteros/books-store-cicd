@@ -1,0 +1,124 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      ci_run_id:
+        description: Run ID of the latest successful CI publication on main
+        required: true
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: bookstore-deployment
+  cancel-in-progress: false
+
+jobs:
+  release:
+    permissions:
+      actions: read
+      contents: read
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      (github.event.workflow_run.event == 'push' || github.event.workflow_run.event == 'workflow_dispatch')))
+    runs-on: ubuntu-latest
+    outputs:
+      release_images: ${{ steps.resolve.outputs.release_images }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Verify and read the release manifest
+        id: resolve
+        env:
+          CI_RUN_ID: ${{ github.event.workflow_run.id || inputs.ci_run_id }}
+          GH_TOKEN: ${{ github.token }}
+        run: python3 infra/resolve-release.py
+
+  deploy-staging:
+    needs: release
+    permissions:
+      contents: read
+    uses: ./.github/workflows/deploy-environment.yml
+    with:
+      workspace: staging
+      release_images: ${{ needs.release.outputs.release_images }}
+    secrets: inherit
+
+  smoke-staging:
+    needs: deploy-staging
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: infra/e2e/package-lock.json
+      - name: Install the acceptance browser
+        id: browser
+        working-directory: infra/e2e
+        run: |
+          npm ci --ignore-scripts
+          npm run install:browser
+      - name: Verify staging and exercise a purchase in Chromium
+        if: ${{ !cancelled() }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          TF_WORKSPACE: staging
+          APPLICATION_URL: ${{ needs.deploy-staging.outputs.application_url }}
+          EXPECTED_REVISION: ${{ needs.deploy-staging.outputs.revision }}
+          BOOTSTRAP_TASK: ${{ needs.deploy-staging.outputs.bootstrap_task }}
+          ACCEPTANCE_BROWSER_STATUS: ${{ steps.browser.outcome }}
+        run: bash infra/release-health.sh verify "$EXPECTED_REVISION" acceptance
+      - name: Preserve the staging acceptance report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: staging-acceptance-report
+          path: infra/e2e/playwright-report/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  deploy-production:
+    needs: [release, smoke-staging]
+    permissions:
+      contents: read
+    uses: ./.github/workflows/deploy-environment.yml
+    with:
+      workspace: production
+      release_images: ${{ needs.release.outputs.release_images }}
+    secrets: inherit
+
+  smoke-production:
+    needs: deploy-production
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Verify production through its HTTPS endpoint
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          TF_WORKSPACE: production
+          APPLICATION_URL: ${{ needs.deploy-production.outputs.application_url }}
+          EXPECTED_REVISION: ${{ needs.deploy-production.outputs.revision }}
+        run: bash infra/release-health.sh verify "$EXPECTED_REVISION"

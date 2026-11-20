@@ -1,0 +1,88 @@
+name: Deploy environment
+
+on:
+  workflow_call:
+    inputs:
+      workspace:
+        required: true
+        type: string
+      release_images:
+        required: true
+        type: string
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      AWS_SESSION_TOKEN:
+        required: true
+    outputs:
+      application_url:
+        value: ${{ jobs.deploy.outputs.application_url }}
+      revision:
+        value: ${{ jobs.deploy.outputs.revision }}
+      bootstrap_task:
+        value: ${{ jobs.deploy.outputs.bootstrap_task }}
+
+jobs:
+  deploy:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: ${{ inputs.workspace }}
+    outputs:
+      application_url: ${{ steps.activate.outputs.application_url }}
+      revision: ${{ steps.activate.outputs.revision }}
+      bootstrap_task: ${{ steps.activate.outputs.bootstrap_task }}
+    env:
+      AWS_REGION: us-east-1
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+      TF_IN_AUTOMATION: 'true'
+      TF_WORKSPACE: ${{ inputs.workspace }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+        with:
+          terraform_version: 1.14.6
+          terraform_wrapper: false
+      - name: Verify the Academy session
+        run: |
+          : "${AWS_ACCESS_KEY_ID:?Configure the AWS_ACCESS_KEY_ID repository secret}"
+          : "${AWS_SECRET_ACCESS_KEY:?Configure the AWS_SECRET_ACCESS_KEY repository secret}"
+          : "${AWS_SESSION_TOKEN:?Configure the AWS_SESSION_TOKEN repository secret}"
+          aws sts get-caller-identity --no-cli-pager --query 'Account' --output text
+      - name: Initialize remote state and validate Terraform
+        env:
+          TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+        run: |
+          : "${TF_STATE_BUCKET:?Configure the TF_STATE_BUCKET repository variable}"
+          terraform -chdir=infra fmt -check
+          env -u TF_WORKSPACE terraform -chdir=infra init -input=false -lockfile=readonly \
+            -backend-config="bucket=$TF_STATE_BUCKET" -backend-config="region=$AWS_REGION"
+          env -u TF_WORKSPACE terraform -chdir=infra workspace select -or-create "$TF_WORKSPACE"
+          terraform -chdir=infra validate
+      - name: Provision AWS infrastructure and register the release
+        env:
+          TF_VAR_release_images: ${{ inputs.release_images }}
+          TF_VAR_api_alarm_topic_arn: ${{ vars.BOOKSTORE_ALARM_TOPIC_ARN }}
+        run: |
+          bash infra/ensure-log-bucket.sh
+          python3 infra/apply-release.py
+      - name: Initialize the PostgreSQL schema and roles
+        run: bash infra/bootstrap-db.sh
+      - name: Activate the paired ECS revision
+        id: activate
+        run: |
+          bash infra/deploy-app.sh
+          printf 'application_url=%s\n' "$(terraform -chdir=infra output -raw application_url)" >> "$GITHUB_OUTPUT"
+          printf 'revision=%s\n' "$(terraform -chdir=infra output -raw app_task_definition_arn)" >> "$GITHUB_OUTPUT"
+          if [[ "$TF_WORKSPACE" == staging ]]; then
+            task=$(terraform -chdir=infra output -json bootstrap_task | python3 -c 'import json, sys; print(json.dumps(json.load(sys.stdin)))')
+            printf 'bootstrap_task=%s\n' "$task" >> "$GITHUB_OUTPUT"
+          fi

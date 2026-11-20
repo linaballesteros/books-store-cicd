@@ -6,6 +6,7 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Environment and secrets
+/.aws/
 .env
 .env.*
 !.env.example
@@ -39,6 +40,11 @@ build/
 .next/
 coverage/
 lcov.info
+/.coverage
+/infra/coverage.xml
+/infra/e2e/playwright-report/
+/infra/e2e/test-results/
+/infra/**/__pycache__/
 frontend/test-results/
 
 # Local container data
@@ -50,6 +56,12 @@ compose.override.yaml
 
 # RDS bootstrap credentials
 database/rds/bootstrap.env
+
+# Terraform working data and local state
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
 
 # Course documents (kept outside the repository)
 docs/
