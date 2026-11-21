@@ -37,11 +37,11 @@ h1 span { color: var(--green); }
 .L { --accent: #dfe9d9; } .Q { --accent: #e6edaf; } .A { --accent: #cddfd7; }
 .jump a { display: flex; justify-content: space-between; align-items: center; color: var(--ink); border: 1px solid var(--line); padding: 2.3mm 3mm; background: var(--accent); font: 750 10pt var(--heading); text-decoration: none; }
 .jump b { font: 8.3pt var(--mono); }
-.schedule { display: grid; grid-template-columns: 1fr 1fr; gap: 7mm; }
+.schedule { display: grid; gap: 3mm; }
 .schedule h2 { padding-bottom: 2.2mm; border-bottom: 2px solid var(--ink); font-size: 15pt; }
 .schedule h2 small { color: var(--green); font: 8pt var(--mono); white-space: nowrap; }
-.timeline { list-style: none; padding: 0; }
-.timeline li { display: grid; grid-template-columns: 24mm 18mm 1fr; gap: 1.5mm; min-height: 9mm; padding: 1.38mm 0; align-items: start; border-bottom: 1px solid var(--line); }
+.timeline { display: grid; grid-template-columns: 1fr 1fr; gap: 0 5mm; list-style: none; padding: 0; }
+.timeline li { display: grid; grid-template-columns: 26mm 18mm 1fr; gap: 1.3mm; min-height: 7mm; padding: 1.38mm 0; align-items: start; border-bottom: 1px solid var(--line); }
 .clock, .slide-num { font: 8.8pt var(--mono); white-space: nowrap; }
 .timeline .clock { padding-top: .6mm; font-size: 8pt; }
 .speaker { display: block; padding: .45mm .9mm; background: var(--accent); font: 760 8.1pt var(--heading); }
@@ -76,6 +76,7 @@ h1 span { color: var(--green); }
 @media (max-width: 680px) {
   .page { min-height: 0; margin: 0 0 12px; padding: 24px 20px; }
   .schedule, .qa-grid { grid-template-columns: 1fr; gap: 20px; }
+  .timeline { grid-template-columns: 1fr; }
   .hero { grid-template-columns: 1fr 92px; }
   h1 { font-size: clamp(27pt,7.6vw,42pt); }
   .timebox strong { font-size: 25pt; }
@@ -106,10 +107,11 @@ h1 span { color: var(--green); }
     <a class="L" href="#lina">Lina <b>02–03</b></a><a class="Q" href="#quinnie">Quinnie <b>04–05</b></a><a class="A" href="#alejandro">Alejandro <b>06–07</b></a>
   </div>
   <div class="schedule">
-    <div><h2>Presentación <small>00:00–09:50</small></h2><ol class="timeline"><li><span class="clock">00:00–00:30</span><span class="speaker A">Alejandro</span><span class="cue-title">Apertura <small>D1</small></span></li><li><span class="clock">00:30–01:25</span><span class="speaker Q">Quinnie</span><span class="cue-title">Qué hace BookStore <small>D2</small></span></li><li><span class="clock">01:25–02:10</span><span class="speaker L">Lina</span><span class="cue-title">Ramas y eventos <small>D3</small></span></li><li><span class="clock">02:10–02:30</span><span class="speaker L">Lina</span><span class="cue-title">Flujograma de extremo a extremo <small>D4</small></span></li><li><span class="clock">02:30–03:15</span><span class="speaker L">Lina</span><span class="cue-title">CI del backend <small>D5</small></span></li><li><span class="clock">03:15–03:55</span><span class="speaker Q">Quinnie</span><span class="cue-title">CI del frontend y release <small>D5</small></span></li><li><span class="clock">03:55–05:10</span><span class="speaker A">Alejandro</span><span class="cue-title">Despliegue y promoción <small>D6</small></span></li><li><span class="clock">05:10–06:30</span><span class="speaker A">Alejandro</span><span class="cue-title">Arquitectura AWS <small>D7</small></span></li><li><span class="clock">06:30–07:10</span><span class="speaker L">Lina</span><span class="cue-title">Unitarias, cobertura e integración <small>D8</small></span></li><li><span class="clock">07:10–07:45</span><span class="speaker Q">Quinnie</span><span class="cue-title">Pruebas sobre el despliegue <small>D8</small></span></li><li><span class="clock">07:45–08:40</span><span class="speaker Q">Quinnie</span><span class="cue-title">Tres cambios que podemos mostrar <small>D9</small></span></li><li><span class="clock">08:40–09:50</span><span class="speaker A">Alejandro</span><span class="cue-title">Rollback automático y manual <small>D10</small></span></li></ol></div>
-    <div><h2>Demo y cierre <small>09:50–15:00</small></h2><ol class="timeline"><li><span class="clock">09:50–10:40</span><span class="speaker L">Lina</span><span class="cue-title">Demo · CI e integración <small>D11</small></span></li><li><span class="clock">10:40–11:15</span><span class="speaker Q">Quinnie</span><span class="cue-title">Demo · Sonar y publicación <small>D11</small></span></li><li><span class="clock">11:15–12:25</span><span class="speaker L">Lina</span><span class="cue-title">Demo · CD y smoke en producción <small>D11</small></span></li><li><span class="clock">12:25–13:15</span><span class="speaker Q">Quinnie</span><span class="cue-title">Demo · Aceptación y app en ambos ambientes <small>D11</small></span></li><li><span class="clock">13:15–13:45</span><span class="speaker A">Alejandro</span><span class="cue-title">Demo · Botón de pánico <small>D11</small></span></li><li><span class="clock">13:45–14:15</span><span class="speaker L">Lina</span><span class="cue-title">Aprendizaje · Probar con datos reales <small>D12</small></span></li><li><span class="clock">14:15–14:45</span><span class="speaker Q">Quinnie</span><span class="cue-title">Aprendizaje · Probar la compra completa <small>D12</small></span></li><li><span class="clock">14:45–15:00</span><span class="speaker A">Alejandro</span><span class="cue-title">Cierre <small>D12</small></span></li></ol></div>
+    <div><h2>Lina <small>00:00–05:00</small></h2><ol class="timeline"><li><span class="clock">00:00–00:25</span><span class="speaker L">Lina</span><span class="cue-title">Apertura <small>D1</small></span></li><li><span class="clock">00:25–01:15</span><span class="speaker L">Lina</span><span class="cue-title">Qué hace BookStore <small>D2</small></span></li><li><span class="clock">01:15–02:20</span><span class="speaker L">Lina</span><span class="cue-title">Ramas y eventos <small>D3</small></span></li><li><span class="clock">02:20–03:00</span><span class="speaker L">Lina</span><span class="cue-title">Flujograma completo <small>D4</small></span></li><li><span class="clock">03:00–04:00</span><span class="speaker L">Lina</span><span class="cue-title">CI del backend <small>D5</small></span></li><li><span class="clock">04:00–05:00</span><span class="speaker L">Lina</span><span class="cue-title">Evidencia y aprendizaje <small>D5</small></span></li></ol></div>
+    <div><h2>Quinnie <small>05:00–10:00</small></h2><ol class="timeline"><li><span class="clock">05:00–06:15</span><span class="speaker Q">Quinnie</span><span class="cue-title">Frontend, Quality Gate y release <small>D6</small></span></li><li><span class="clock">06:15–07:20</span><span class="speaker Q">Quinnie</span><span class="cue-title">Qué prueba cada nivel <small>D7</small></span></li><li><span class="clock">07:20–08:35</span><span class="speaker Q">Quinnie</span><span class="cue-title">Tres mejoras con evidencia <small>D8</small></span></li><li><span class="clock">08:35–09:05</span><span class="speaker Q">Quinnie</span><span class="cue-title">Evidencia de aceptación <small>D9</small></span></li><li><span class="clock">09:05–10:00</span><span class="speaker Q">Quinnie</span><span class="cue-title">Demo de staging y producción <small>D9</small></span></li></ol></div>
+    <div><h2>Alejandro <small>10:00–15:00</small></h2><ol class="timeline"><li><span class="clock">10:00–11:05</span><span class="speaker A">Alejandro</span><span class="cue-title">IaC, despliegue y promoción <small>D10</small></span></li><li><span class="clock">11:05–12:00</span><span class="speaker A">Alejandro</span><span class="cue-title">Arquitectura AWS <small>D11</small></span></li><li><span class="clock">12:00–12:55</span><span class="speaker A">Alejandro</span><span class="cue-title">Rollback automático y manual <small>D12</small></span></li><li><span class="clock">12:55–13:45</span><span class="speaker A">Alejandro</span><span class="cue-title">Evidencia de CD y smoke <small>D13</small></span></li><li><span class="clock">13:45–14:25</span><span class="speaker A">Alejandro</span><span class="cue-title">Evidencia del botón de pánico <small>D13</small></span></li><li><span class="clock">14:25–15:00</span><span class="speaker A">Alejandro</span><span class="cue-title">Aprendizajes y cierre <small>D14</small></span></li></ol></div>
   </div>
-  <p class="tip">D indica el número de diapositiva. El reloj empieza con la primera frase. Durante la demo, avancen por acciones y usen las frases como guía.</p>
+  <p class="tip">D indica el número de diapositiva. El reloj empieza con la primera frase. Hay dos entregas de turno, a las 5:00 y a las 10:00. Durante las demos, usen las frases como guía.</p>
 
   <footer><span>PROYECTO FINAL · CI/CD</span><span>01 / 08</span></footer>
 </section>
@@ -117,27 +119,27 @@ h1 span { color: var(--green); }
   <div class="running"><span>BookStore Co. / Guion de sustentación</span><span>GUION / LINA</span></div>
   <header class="person-head L" id="lina">
       <div><p class="eyebrow">BACKEND · DATOS · INTEGRACIÓN</p><h2>Lina</h2><p>Lina Sofía Ballesteros</p></div>
-      <span class="phase">PARTE I<br><b>2:30</b></span>
+      <span class="phase">PARTE I<br><b>3:00</b></span>
     </header><article class="card">
-    <div class="card-top"><span class="clock">01:25–02:10</span><span class="slide-num">DIAP. 3</span></div>
+    <div class="card-top"><span class="clock">00:00–00:25</span><span class="slide-num">DIAP. 1</span></div>
+    <h3>Apertura</h3>
+    <p class="direction"><b>En pantalla</b> Proyecta la portada y presenta al equipo. Avanza a la diapositiva 2.</p>
+    <p class="speech">Hola. Somos Lina, Quinnie y Alejandro. Elegimos BookStore Co. para mostrar cómo un cambio llega desde un pull request hasta producción, cómo comprobamos que funciona y cómo recuperamos el servicio si una versión falla.</p>
+  </article><article class="card">
+    <div class="card-top"><span class="clock">00:25–01:15</span><span class="slide-num">DIAP. 2</span></div>
+    <h3>Qué hace BookStore</h3>
+    <p class="direction"><b>En pantalla</b> Usa la captura y señala los tres componentes de la app.</p>
+    <p class="speech">BookStore es una tienda de libros. Se puede explorar el catálogo, agregar un libro al carrito, comprar y consultar el historial. React construye la interfaz, Vite genera el build y Nginx lo sirve. La API REST usa Node.js y Express. PostgreSQL guarda catálogo, clientes, pedidos e inventario. La complejidad aparece al comprar. La interfaz envía el pedido, la API valida cliente, libro y stock, y la base registra el pedido y descuenta inventario. Ese recorrido cruza los tres componentes y nos dio un caso concreto para diseñar las pruebas.</p>
+  </article><article class="card">
+    <div class="card-top"><span class="clock">01:15–02:20</span><span class="slide-num">DIAP. 3</span></div>
     <h3>Ramas y eventos</h3>
-    <p class="direction"><b>En pantalla</b> Recorre las tres filas de arriba abajo. Sigue en la diapositiva 4.</p>
-    <p class="speech">Usamos Trunk-Based Development. Las ramas cortas nos permiten integrar cambios pequeños y detectar conflictos temprano. Para entrar a main exigimos un pull request, una aprobación y el check backend en verde. El PR valida el cambio. Ya en main, un CI exitoso publica las imágenes y dispara CD mediante workflow_run. También tenemos acciones manuales para elegir una release de main y redesplegar o para recuperar un ambiente con el botón de pánico.</p>
+    <p class="direction"><b>En pantalla</b> Recorre las tres filas. En la primera, señala la protección de main.</p>
+    <p class="speech">Adoptamos Trunk-Based Development. Cada cambio sale en una rama corta y entra a main por pull request. Elegimos ramas cortas porque permiten integrar cambios pequeños con frecuencia y detectar conflictos temprano. El ruleset de main exige un PR, una aprobación de un compañero y el check backend en verde. En un PR se valida el cambio. Con el push que produce el merge, CI vuelve a validar y publica las imágenes si pasan sus controles. El éxito de ese CI activa CD por workflow_run. Tenemos además dos acciones manuales. Podemos redesplegar una release de main con el ID de su CI o recuperar un ambiente mediante el botón de pánico.</p>
   </article><article class="card">
-    <div class="card-top"><span class="clock">02:10–02:30</span><span class="slide-num">DIAP. 4</span></div>
-    <h3>Flujograma de extremo a extremo</h3>
-    <p class="direction"><b>En pantalla</b> Recorre la fila superior y señala las flechas de recuperación. Sigue a la diapositiva 5.</p>
-    <p class="speech">Este es el recorrido completo. GitHub dispara CI. Main publica las imágenes y el manifiesto. CD despliega staging y solo promueve a producción si pasa la validación. Abajo se ve cómo un fallo o el botón de pánico puede activar el rollback.</p>
-  </article><article class="card">
-    <div class="card-top"><span class="clock">02:30–03:15</span><span class="slide-num">DIAP. 5</span></div>
-    <h3>CI del backend</h3>
-    <p class="direction"><b>En pantalla</b> Señala la fila inicial y los carriles API y API + datos. Da paso a Quinnie en la misma diapositiva.</p>
-    <p class="speech">En GitHub Actions, cada job obtiene el código del commit y prepara su entorno. En el backend usamos Node 24, npm ci, pruebas nativas con node:test y un reporte LCOV. También comprobamos que el Dockerfile construye. En un job aparte levantamos PostgreSQL 17 como service container, cargamos el schema y el seed y corremos pruebas de integración. Así distinguimos un error en la lógica de la API de un problema que aparece al operar contra el motor de base de datos. Quinnie les muestra el otro carril y cómo se juntan los resultados.</p>
-  </article><article class="card">
-    <div class="card-top"><span class="clock">06:30–07:10</span><span class="slide-num">DIAP. 8</span></div>
-    <h3>Unitarias, cobertura e integración</h3>
-    <p class="direction"><b>En pantalla</b> Señala las filas de CI. Pasa a Quinnie en la misma diapositiva.</p>
-    <p class="speech">En las unitarias del backend, por ejemplo, verificamos que se rechace una cantidad inválida o una sesión sin autenticar. Eso nos da retroalimentación rápida sobre la lógica. Con PostgreSQL real comprobamos que crear un pedido descuente el stock y que se rechace una compra si falta inventario o el libro o cliente no existe. La cobertura indica qué código ejercitaron las pruebas. En SonarCloud se reporta el LCOV de ambos componentes y el XML de los scripts Python de despliegue. Cada prueba responde una pregunta distinta.</p>
+    <div class="card-top"><span class="clock">02:20–03:00</span><span class="slide-num">DIAP. 4</span></div>
+    <h3>Flujograma completo</h3>
+    <p class="direction"><b>En pantalla</b> Sigue la fila superior de izquierda a derecha y señala las dos entradas al rollback.</p>
+    <p class="speech">Este es el recorrido completo. GitHub dispara CI. Solo main publica las imágenes y el manifiesto de release. El manifiesto identifica las dos imágenes que CD usa primero en staging. Cuando staging pasa la validación, el mismo par se promueve a producción. Abajo están las dos entradas a recuperación, el fallo de validación de un ambiente y la acción manual. Ahora voy a abrir el primer tramo y mostrar qué valida el backend.</p>
   </article>
   <footer><span>PROYECTO FINAL · CI/CD</span><span>02 / 08</span></footer>
 </section>
@@ -145,22 +147,17 @@ h1 span { color: var(--green); }
   <div class="running"><span>BookStore Co. / Guion de sustentación</span><span>GUION / LINA</span></div>
   <header class="person-head L">
       <div><p class="eyebrow">BACKEND · DATOS · INTEGRACIÓN</p><h2>Lina</h2><p>Lina Sofía Ballesteros</p></div>
-      <span class="phase">PARTE II<br><b>2:30</b></span>
+      <span class="phase">PARTE II<br><b>2:00</b></span>
     </header><article class="card">
-    <div class="card-top"><span class="clock">09:50–10:40</span><span class="slide-num">DIAP. 11</span></div>
-    <h3>Demo · CI e integración</h3>
-    <p class="direction"><b>En pantalla</b> Abre el run de CI y expande backend-integration. Muestra el servicio o la carga de datos y el resultado de las pruebas. Entrega a Quinnie.</p>
-    <p class="speech">Este es un run exitoso de CI en main. Aquí están backend y frontend como jobs separados. Voy al job de integración. El runner inicia el contenedor PostgreSQL, prepara el schema y el seed, y aquí vemos el resultado de la prueba de pedido e inventario. Este log es la evidencia de que el flujo se ejercitó contra PostgreSQL.</p>
+    <div class="card-top"><span class="clock">03:00–04:00</span><span class="slide-num">DIAP. 5</span></div>
+    <h3>CI del backend</h3>
+    <p class="direction"><b>En pantalla</b> Señala checkout, los dos pasos de backend y el job de integración.</p>
+    <p class="speech">En GitHub Actions, cada job obtiene el código del commit, prepara Node 24 e instala dependencias con npm ci. En el backend usamos node:test para comprobar, por ejemplo, que se rechacen cantidades inválidas y sesiones sin autenticar. Generamos LCOV para SonarCloud y comprobamos que el Dockerfile construye. En el job de integración levantamos PostgreSQL 17, cargamos el schema y el seed y probamos que crear un pedido descuente inventario. También comprobamos el rechazo cuando falta stock, el libro no existe o el cliente es inválido. Así cubrimos tanto la validación de la lógica como su comportamiento contra el motor real.</p>
   </article><article class="card">
-    <div class="card-top"><span class="clock">11:15–12:25</span><span class="slide-num">DIAP. 11</span></div>
-    <h3>Demo · CD y smoke en producción</h3>
-    <p class="direction"><b>En pantalla</b> Abre el gráfico de CD. Señala staging, aceptación y producción. En smoke-production, expande el paso y muestra el resultado. Pasa a Quinnie.</p>
-    <p class="speech">Este es el run de CD. Primero se despliega staging y se ejecutan sus validaciones. Solo cuando ese tramo termina en verde arranca el despliegue a producción. Aquí se ve el smoke de producción. Lo que queremos mostrar en el log es que el servicio desplegado respondió por HTTPS y devolvió el catálogo. Quinnie les muestra qué hizo la aceptación en staging y cómo se ven los dos ambientes.</p>
-  </article><article class="card">
-    <div class="card-top"><span class="clock">13:45–14:15</span><span class="slide-num">DIAP. 12</span></div>
-    <h3>Aprendizaje · Probar con datos reales</h3>
-    <p class="direction"><b>En pantalla</b> Señala pedidos e inventario. Pasa a Quinnie.</p>
-    <p class="speech">Mi aprendizaje fue separar la validación del dato de la operación completa. La unitaria puede rechazar una cantidad inválida y la integración demuestra qué pasa realmente en PostgreSQL cuando se crea un pedido y se descuenta inventario. Eso nos dio una forma práctica de detectar fallas antes de publicar la imagen.</p>
+    <div class="card-top"><span class="clock">04:00–05:00</span><span class="slide-num">DIAP. 5</span></div>
+    <h3>Evidencia y aprendizaje</h3>
+    <p class="direction"><b>En pantalla</b> Abre CI en verde y backend-integration. Muestra los jobs separados, la carga de datos y el resultado. A las 4:45, vuelve a la diapositiva y pasa a Quinnie.</p>
+    <p class="speech">En el gráfico se ven frontend y backend como jobs separados. Aquí, en integración, aparecen el contenedor de PostgreSQL, la carga del schema y el resultado de las pruebas de pedidos. Mi aprendizaje fue separar un error de lógica, como una cantidad inválida, de uno de persistencia. El motor real permite comprobar el efecto de la compra sobre el stock. Quinnie les va a mostrar cómo validamos la interfaz y cómo sale la release.</p>
   </article>
   <footer><span>PROYECTO FINAL · CI/CD</span><span>03 / 08</span></footer>
 </section>
@@ -168,22 +165,17 @@ h1 span { color: var(--green); }
   <div class="running"><span>BookStore Co. / Guion de sustentación</span><span>GUION / QUINNIE</span></div>
   <header class="person-head Q" id="quinnie">
       <div><p class="eyebrow">FRONTEND · RELEASE · DEMO DE APP</p><h2>Quinnie</h2><p>Quinnie Nastasja Villarreal Aragon</p></div>
-      <span class="phase">PARTE I<br><b>2:10</b></span>
+      <span class="phase">PARTE I<br><b>2:20</b></span>
     </header><article class="card">
-    <div class="card-top"><span class="clock">00:30–01:25</span><span class="slide-num">DIAP. 2</span></div>
-    <h3>Qué hace BookStore</h3>
-    <p class="direction"><b>En pantalla</b> Señala la captura y luego los tres componentes. Pasa a Lina.</p>
-    <p class="speech">BookStore es una tienda de libros. El usuario explora el catálogo, agrega un libro al carrito, confirma la compra y consulta el pedido en el historial. El frontend es React, se construye con Vite y se sirve con Nginx. La API REST usa Node.js y Express. PostgreSQL guarda el catálogo, los clientes, los pedidos y el inventario. La complejidad se ve al comprar. La interfaz envía el pedido, el backend valida cliente, libro y stock, y la base de datos registra el pedido y ajusta el inventario. Una sola operación cruza las tres capas. Por eso escogimos esta app como base y usamos ese recorrido para diseñar las pruebas.</p>
+    <div class="card-top"><span class="clock">05:00–06:15</span><span class="slide-num">DIAP. 6</span></div>
+    <h3>Frontend, Quality Gate y release</h3>
+    <p class="direction"><b>En pantalla</b> Sigue los carriles superiores y las tres cajas inferiores. Muestra la conexión entre el manifiesto y CD.</p>
+    <p class="speech">En el frontend, ESLint revisa el código y Vitest con Testing Library comprueba el comportamiento de componentes. También generamos cobertura, hacemos el build de producción con Vite y validamos el build Docker. SonarCloud recibe la cobertura y ejecuta el análisis estático. El Quality Gate bloquea la publicación si falla. En main, Buildx y QEMU construyen y publican dos imágenes en Docker Hub, una para frontend y otra para backend. Cada una admite amd64 y arm64. El job de release guarda un digest por imagen en release.json. Ese archivo permite que CI entregue exactamente lo que CD necesita para desplegar.</p>
   </article><article class="card">
-    <div class="card-top"><span class="clock">03:15–03:55</span><span class="slide-num">DIAP. 5</span></div>
-    <h3>CI del frontend y release</h3>
-    <p class="direction"><b>En pantalla</b> Señala Interfaz, SonarCloud y las cajas de release. Entrega a Alejandro.</p>
-    <p class="speech">En el frontend, ESLint revisa el código y Vitest con Testing Library prueba componentes. Generamos cobertura, construimos con Vite y validamos la imagen Docker. SonarCloud recibe la cobertura y su Quality Gate frena la publicación si falla. En main, Buildx y QEMU construyen las imágenes para amd64 y arm64 y las publican en Docker Hub. CI guarda los digests del frontend y del backend en release.json. Con ese archivo, Alejandro puede desplegar la misma combinación en ambos ambientes.</p>
-  </article><article class="card">
-    <div class="card-top"><span class="clock">07:10–07:45</span><span class="slide-num">DIAP. 8</span></div>
-    <h3>Pruebas sobre el despliegue</h3>
-    <p class="direction"><b>En pantalla</b> Señala las dos últimas filas. Sigue a la diapositiva 9.</p>
-    <p class="speech">Testing Library nos permite probar el comportamiento de componentes de React con Vitest. Una vez desplegada la app, el smoke HTTP comprueba que la portada y el catálogo respondan en staging y en producción. En staging, Playwright con Chromium va más lejos. Entra con datos sintéticos, compra un libro y busca el mismo pedido en el historial. Después limpiamos los datos de esa corrida. En producción hacemos una lectura para verificar disponibilidad sin crear pedidos.</p>
+    <div class="card-top"><span class="clock">06:15–07:20</span><span class="slide-num">DIAP. 7</span></div>
+    <h3>Qué prueba cada nivel</h3>
+    <p class="direction"><b>En pantalla</b> Recorre la matriz en orden. Haz énfasis en la diferencia entre la aceptación preprod y el smoke postprod.</p>
+    <p class="speech">Cada nivel responde una pregunta. ESLint y SonarCloud detectan problemas estáticos. node:test y Vitest comprueban lógica de API y componentes. El LCOV de ambos componentes se reporta en SonarCloud, junto con el XML de cobertura de los scripts de despliegue. La integración, que mostró Lina, confirma pedido e inventario con PostgreSQL real. En el ambiente desplegado, un smoke por HTTPS revisa portada y catálogo. En staging añadimos aceptación con Playwright y Chromium. La prueba compra un libro y encuentra ese pedido en el historial. Usamos datos sintéticos por ejecución y los limpiamos. En producción, el smoke verifica disponibilidad sin crear pedidos.</p>
   </article>
   <footer><span>PROYECTO FINAL · CI/CD</span><span>04 / 08</span></footer>
 </section>
@@ -191,27 +183,22 @@ h1 span { color: var(--green); }
   <div class="running"><span>BookStore Co. / Guion de sustentación</span><span>GUION / QUINNIE</span></div>
   <header class="person-head Q">
       <div><p class="eyebrow">FRONTEND · RELEASE · DEMO DE APP</p><h2>Quinnie</h2><p>Quinnie Nastasja Villarreal Aragon</p></div>
-      <span class="phase">PARTE II<br><b>2:50</b></span>
+      <span class="phase">PARTE II<br><b>2:40</b></span>
     </header><article class="card">
-    <div class="card-top"><span class="clock">07:45–08:40</span><span class="slide-num">DIAP. 9</span></div>
-    <h3>Tres cambios que podemos mostrar</h3>
-    <p class="direction"><b>En pantalla</b> Enumera los tres cambios en pantalla. Pasa a Alejandro.</p>
-    <p class="speech">Hay tres cambios del proyecto que se ven en Actions. Primero, separamos la validación del frontend y del backend en jobs que pueden correr en paralelo. Basta mirar el gráfico para ubicar cuál componente falló. Segundo, incorporamos una integración con PostgreSQL real, con schema y seed, para poner a prueba lo que ocurre con los pedidos y el stock. Tercero, publicamos dos imágenes multiplataforma. En el run podemos abrir la verificación del manifiesto de una imagen y ver las dos arquitecturas, amd64 y arm64. Además, el job release junta los digests de las dos imágenes para el despliegue. Ahora Alejandro explica cómo nos recuperamos si una versión falla.</p>
+    <div class="card-top"><span class="clock">07:20–08:35</span><span class="slide-num">DIAP. 8</span></div>
+    <h3>Tres mejoras con evidencia</h3>
+    <p class="direction"><b>En pantalla</b> Recuerda el gráfico de CI y el job PostgreSQL vistos con Lina. Abre el Quality Gate y el log de Buildx. Señala ambas plataformas y vuelve a la presentación.</p>
+    <p class="speech">Estas son las tres mejoras. Primero, CI por componente, con jobs independientes para que el equipo vea dónde falla un cambio. Segundo, integración contra PostgreSQL con schema y seed en el runner. Lina ya mostró esos dos resultados. Tercero, el release multiplataforma. Aquí se ve el Quality Gate en verde. En el job de publicación, la verificación del manifiesto muestra linux/amd64 y linux/arm64. El backend repite ese proceso. El job release reúne los digests de las dos imágenes para el despliegue.</p>
   </article><article class="card">
-    <div class="card-top"><span class="clock">10:40–11:15</span><span class="slide-num">DIAP. 11</span></div>
-    <h3>Demo · Sonar y publicación</h3>
-    <p class="direction"><b>En pantalla</b> Vuelve al gráfico de CI. Abre el Quality Gate y muestra la verificación Buildx en publish-frontend. Entrega a Lina.</p>
-    <p class="speech">El Quality Gate está en verde. Ahora abro la publicación del frontend. En la verificación del manifiesto aparecen linux/amd64 y linux/arm64. El backend sigue el mismo proceso. El run termina con el manifiesto de release que consume CD.</p>
+    <div class="card-top"><span class="clock">08:35–09:05</span><span class="slide-num">DIAP. 9</span></div>
+    <h3>Evidencia de aceptación</h3>
+    <p class="direction"><b>En pantalla</b> Abre el enlace de aceptación. Expande el paso de Chromium para mostrar la compra y el historial.</p>
+    <p class="speech">Este es el resultado de la aceptación en staging. Chromium compró un libro de prueba y confirmó el mismo pedido en el historial. Eso verifica que la interfaz y la API completan juntas el recorrido.</p>
   </article><article class="card">
-    <div class="card-top"><span class="clock">12:25–13:15</span><span class="slide-num">DIAP. 11</span></div>
-    <h3>Demo · Aceptación y app en ambos ambientes</h3>
-    <p class="direction"><b>En pantalla</b> Abre el paso de aceptación y muestra la prueba de compra. Cambia a las pestañas de staging y producción, abre el catálogo en ambas y entrega a Alejandro.</p>
-    <p class="speech">Este paso de Chromium compró un libro de prueba y comprobó el pedido en el historial. Ahora abrimos staging y vemos el catálogo. Pasamos a producción y comprobamos que también carga. El log demuestra la compra en staging, y estas dos pestañas muestran los ambientes funcionando.</p>
-  </article><article class="card">
-    <div class="card-top"><span class="clock">14:15–14:45</span><span class="slide-num">DIAP. 12</span></div>
-    <h3>Aprendizaje · Probar la compra completa</h3>
-    <p class="direction"><b>En pantalla</b> Mantén la misma diapositiva. Pasa a Alejandro.</p>
-    <p class="speech">Desde el frontend, un componente en verde comprueba su comportamiento. El recorrido en Chromium nos permitió verificar que catálogo, carrito, API e historial funcionaran juntos. Usar datos sintéticos por ejecución y limpiarlos hace que la prueba sea repetible sin dejar pedidos de prueba en el ambiente.</p>
+    <div class="card-top"><span class="clock">09:05–10:00</span><span class="slide-num">DIAP. 9</span></div>
+    <h3>Demo de staging y producción</h3>
+    <p class="direction"><b>En pantalla</b> Abre portada y catálogo en staging y luego producción. A las 9:45, cuenta el aprendizaje y pasa a Alejandro.</p>
+    <p class="speech">Aquí tenemos staging con el catálogo respondiendo. Ahora abro producción y compruebo que el catálogo también aparece. El reto fue probar una compra completa sin dejar pedidos de prueba. La aceptación usa datos sintéticos por corrida y los limpia, así podemos repetirla. Alejandro les va a mostrar cómo desplegamos esos ambientes y cómo recuperamos una versión si hace falta.</p>
   </article>
   <footer><span>PROYECTO FINAL · CI/CD</span><span>05 / 08</span></footer>
 </section>
@@ -219,22 +206,22 @@ h1 span { color: var(--green); }
   <div class="running"><span>BookStore Co. / Guion de sustentación</span><span>GUION / ALEJANDRO</span></div>
   <header class="person-head A" id="alejandro">
       <div><p class="eyebrow">CD · TERRAFORM · AWS · ROLLBACK</p><h2>Alejandro</h2><p>Alejandro Ríos Muñoz</p></div>
-      <span class="phase">PARTE I<br><b>3:05</b></span>
+      <span class="phase">PARTE I<br><b>2:55</b></span>
     </header><article class="card">
-    <div class="card-top"><span class="clock">00:00–00:30</span><span class="slide-num">DIAP. 1</span></div>
-    <h3>Apertura</h3>
-    <p class="direction"><b>En pantalla</b> Proyecta la portada. Pasa a Quinnie en la diapositiva 2.</p>
-    <p class="speech">Hola. Somos Lina, Quinnie y Alejandro. Este es BookStore Co. Nuestra pregunta de partida fue cómo llevar un cambio desde un pull request hasta producción con evidencia de que la aplicación funciona, y cómo recuperar el servicio si una versión falla. Para responderla, les vamos a mostrar el pipeline, el despliegue en AWS y una recuperación que ya ejecutamos.</p>
+    <div class="card-top"><span class="clock">10:00–11:05</span><span class="slide-num">DIAP. 10</span></div>
+    <h3>IaC, despliegue y promoción</h3>
+    <p class="direction"><b>En pantalla</b> Sigue el manifiesto, Terraform y ECS en ambos ambientes. Señala las pruebas antes y después de promover.</p>
+    <p class="speech">CD toma release.json del CI exitoso. En staging, Terraform aplica la infraestructura, una tarea de ECS inicializa la base de datos y el servicio activa una revisión con los dos contenedores. Pasan el smoke y la compra de aceptación. Registramos la revisión validada y se habilita producción. Allí Terraform aplica el otro ambiente, ECS activa el mismo par de digests y corre el smoke postprod. Hablamos de Continuous Deployment porque la aprobación está en el PR y, tras el merge, la promoción de un staging validado es automática. Si una validación falla, CD intenta recuperar el ambiente y vuelve a comprobar el servicio.</p>
   </article><article class="card">
-    <div class="card-top"><span class="clock">03:55–05:10</span><span class="slide-num">DIAP. 6</span></div>
-    <h3>Despliegue y promoción</h3>
-    <p class="direction"><b>En pantalla</b> Sigue las flechas desde release.json. Marca el paso de staging a producción.</p>
-    <p class="speech">CD toma el release.json del CI exitoso. Los digests identifican las imágenes exactas. En staging, Terraform aplica la infraestructura, una tarea de ECS inicializa PostgreSQL y el servicio activa la revisión de la aplicación con las dos imágenes. Hacemos un smoke por HTTPS y una aceptación de compra en Chromium. Cuando pasan, registramos la revisión como válida. Ahí se desbloquea el despliegue en producción, que aplica su propia infraestructura y usa los mismos digests. Después corre el smoke de producción. Es Continuous Deployment porque la promoción sucede automáticamente tras el merge y las pruebas. Si falla la validación, el pipeline intenta restaurar la última revisión válida disponible para ese ambiente, verifica la recuperación y deja visible el fallo de la versión candidata.</p>
-  </article><article class="card">
-    <div class="card-top"><span class="clock">05:10–06:30</span><span class="slide-num">DIAP. 7</span></div>
+    <div class="card-top"><span class="clock">11:05–12:00</span><span class="slide-num">DIAP. 11</span></div>
     <h3>Arquitectura AWS</h3>
-    <p class="direction"><b>En pantalla</b> Sigue la ruta de una petición arriba y señala S3 y observabilidad abajo. Pasa a Lina.</p>
-    <p class="speech">Cada ambiente tiene su stack. El navegador entra por el endpoint HTTPS de API Gateway. Elegimos esa ruta porque teníamos el reto de servir HTTPS sin dominio propio. API Gateway nos da TLS gestionado y conecta por VPC Link con el balanceador privado. El ALB dirige tráfico a ECS Fargate. En la tarea corren dos contenedores. Nginx sirve la interfaz y pasa las solicitudes de la API a Express, que consulta RDS PostgreSQL en privado. Elegimos RDS para tener la base gestionada, con su propio ciclo de vida. Reutilizamos el mismo Terraform y separamos el estado por workspace en S3. Parameter Store guarda configuración e historial de revisiones válidas. CloudWatch observa los errores 5xx y SNS entrega las notificaciones. Lina les cuenta cómo validamos cada nivel.</p>
+    <p class="direction"><b>En pantalla</b> Sigue una petición de izquierda a derecha en el diagrama. Señala los servicios de apoyo.</p>
+    <p class="speech">Cada ambiente tiene su stack. API Gateway da una entrada HTTPS con TLS gestionado. Lo elegimos para trabajar sin dominio propio, manteniendo el ALB privado detrás de VPC Link. ECS Fargate ejecuta Nginx para la interfaz y Express para la API. Express consulta RDS PostgreSQL en la red privada. RDS nos permite gestionar la base con un ciclo de vida separado de ECS. Terraform mantiene su estado en S3, con un workspace por ambiente. Parameter Store guarda configuración y revisiones validadas. CloudWatch y SNS nos avisan de errores 5xx.</p>
+  </article><article class="card">
+    <div class="card-top"><span class="clock">12:00–12:55</span><span class="slide-num">DIAP. 12</span></div>
+    <h3>Rollback automático y manual</h3>
+    <p class="direction"><b>En pantalla</b> Distingue las dos rutas y explica qué se guarda. Señala la transición :5 → :4.</p>
+    <p class="speech">Si falla una validación, el camino automático busca una revisión validada previamente, la reactiva en ECS y vuelve a correr el smoke. El run deja visible la falla del candidato. El botón de pánico hace la recuperación desde GitHub Actions al elegir el ambiente. En staging regresamos de la revisión cinco a la cuatro. Para repetirlo desde un ambiente sano, hacen falta dos revisiones validadas diferentes. Este rollback recupera la versión de los contenedores. Los datos tienen su propio mecanismo de recuperación. CloudWatch y SNS sirven para avisar al equipo.</p>
   </article>
   <footer><span>PROYECTO FINAL · CI/CD</span><span>06 / 08</span></footer>
 </section>
@@ -242,22 +229,22 @@ h1 span { color: var(--green); }
   <div class="running"><span>BookStore Co. / Guion de sustentación</span><span>GUION / ALEJANDRO</span></div>
   <header class="person-head A">
       <div><p class="eyebrow">CD · TERRAFORM · AWS · ROLLBACK</p><h2>Alejandro</h2><p>Alejandro Ríos Muñoz</p></div>
-      <span class="phase">PARTE II<br><b>1:55</b></span>
+      <span class="phase">PARTE II<br><b>2:05</b></span>
     </header><article class="card">
-    <div class="card-top"><span class="clock">08:40–09:50</span><span class="slide-num">DIAP. 10</span></div>
-    <h3>Rollback automático y manual</h3>
-    <p class="direction"><b>En pantalla</b> Señala las dos rutas. Ubica el resultado :5 → :4 y da paso a Lina para la demo.</p>
-    <p class="speech">Hay dos entradas al rollback. La automática se activa si falla una validación del despliegue. Busca una revisión previamente validada, la reactiva en ECS y vuelve a correr el smoke. El run conserva la falla del candidato aunque el servicio se recupere. La otra entrada es el botón de pánico. En GitHub Actions se elige el ambiente y se lanza el workflow manual. En nuestro ensayo lo usamos en staging y volvimos de la revisión cinco a la cuatro. En el log se ve ECS estable, portada y catálogo respondiendo y la revisión restaurada registrada. Para repetirlo en una cuenta nueva, staging necesita dos revisiones distintas validadas. Este mecanismo recupera la aplicación. Los datos de PostgreSQL tienen un ciclo de recuperación propio. CloudWatch y SNS cubren la alerta al equipo.</p>
+    <div class="card-top"><span class="clock">12:55–13:45</span><span class="slide-num">DIAP. 13</span></div>
+    <h3>Evidencia de CD y smoke</h3>
+    <p class="direction"><b>En pantalla</b> Abre el gráfico de CD y, si hay tiempo, muestra el paso de Terraform y ECS. Expande smoke de staging y producción.</p>
+    <p class="speech">Este es el CD exitoso. Aquí se ven los despliegues de staging y producción. La validación de staging es la dependencia que habilita producción. En los logs del smoke verificamos que el endpoint HTTPS responde y devuelve el catálogo. Esto comprueba la app que quedó corriendo después de cada despliegue.</p>
   </article><article class="card">
-    <div class="card-top"><span class="clock">13:15–13:45</span><span class="slide-num">DIAP. 11</span></div>
-    <h3>Demo · Botón de pánico</h3>
-    <p class="direction"><b>En pantalla</b> Abre Panic rollback, luego el paso de restauración. Señala la revisión, estabilidad y smoke en verde. Regresa a la diapositiva 12.</p>
-    <p class="speech">Este es el rollback manual que ejecutamos. Aquí está la revisión cuatro seleccionada, luego ECS reporta estabilidad y el smoke confirma que la portada y el catálogo responden. Con eso cerramos el ciclo de recuperación.</p>
+    <div class="card-top"><span class="clock">13:45–14:25</span><span class="slide-num">DIAP. 13</span></div>
+    <h3>Evidencia del botón de pánico</h3>
+    <p class="direction"><b>En pantalla</b> Abre Panic rollback. Señala la revisión recuperada, la estabilidad, los smoke y el registro. Vuelve a la presentación.</p>
+    <p class="speech">Este es el rollback manual que ya ejecutamos. Aquí aparece la revisión cuatro seleccionada. Después, ECS confirma estabilidad y el smoke muestra que portada y catálogo responden. Finalmente queda registrada la revisión recuperada. En la diapositiva anterior vimos que la validación fallida puede iniciar esa misma recuperación de forma automática.</p>
   </article><article class="card">
-    <div class="card-top"><span class="clock">14:45–15:00</span><span class="slide-num">DIAP. 12</span></div>
-    <h3>Cierre</h3>
-    <p class="direction"><b>En pantalla</b> Deja visible la diapositiva 12 para las preguntas.</p>
-    <p class="speech">En AWS, el aprendizaje fue preparar la recuperación desde el despliegue. Guardamos la revisión que pasó las pruebas, podemos restaurarla y comprobamos que vuelva a responder. Gracias. Estamos atentos a sus preguntas.</p>
+    <div class="card-top"><span class="clock">14:25–15:00</span><span class="slide-num">DIAP. 14</span></div>
+    <h3>Aprendizajes y cierre</h3>
+    <p class="direction"><b>En pantalla</b> Cierra en la diapositiva 14. Deja esta vista para las preguntas.</p>
+    <p class="speech">En el equipo, probar pedidos con el motor real nos permitió comprobar inventario, y Chromium confirmó el recorrido de compra. En AWS resolvimos HTTPS con API Gateway y aprendimos que la recuperación se prepara desde el despliegue. Guardamos la revisión que pasó las pruebas y volvemos a verificarla cuando la restauramos. Gracias. Estamos atentos a sus preguntas.</p>
   </article>
   <footer><span>PROYECTO FINAL · CI/CD</span><span>07 / 08</span></footer>
 </section>
@@ -272,7 +259,7 @@ h1 span { color: var(--green); }
   </div>
   <h3 class="qa-title">Respuestas técnicas para el jurado</h3>
   <div class="qa-grid"><article class="qa L"><span>Lina</span><h3>¿Qué exige la protección de main?</h3><p>PR, una aprobación y el check backend. La publicación desde main depende además de los jobs de frontend, integración y SonarCloud.</p></article><article class="qa L"><span>Lina</span><h3>¿Qué aporta PostgreSQL real?</h3><p>Ejecuta la lógica contra el motor que usamos en los ambientes. Por ejemplo, verifica que un pedido descuente inventario y que un pedido inválido sea rechazado.</p></article><article class="qa Q"><span>Quinnie</span><h3>¿Qué incluye exactamente la release?</h3><p>Dos imágenes en Docker Hub, cada una publicada para amd64 y arm64. El release.json registra un digest por imagen para que ambos ambientes reciban el mismo par.</p></article><article class="qa Q"><span>Quinnie</span><h3>¿Por qué aceptación solo en staging?</h3><p>Allí verificamos una compra con datos sintéticos y limpiamos la corrida. En producción hacemos un smoke de lectura para verificar disponibilidad sin crear pedidos.</p></article><article class="qa A"><span>Alejandro</span><h3>¿Por qué API Gateway y RDS?</h3><p>API Gateway dio HTTPS gestionado con el ALB privado. RDS separó el ciclo de vida de PostgreSQL del servicio ECS y nos dio una base gestionada en la red privada.</p></article><article class="qa A"><span>Alejandro</span><h3>¿Qué recupera el botón de pánico?</h3><p>Restaura una revisión distinta y validada de la app en ECS y comprueba portada y catálogo. La revisión debe existir en ese ambiente. Los datos de PostgreSQL se recuperan por separado.</p></article></div>
-  <p class="tip">Durante la demo, usa el botón de pánico ya ejecutado. La diapositiva 10 explica el camino automático ante una validación fallida.</p>
+  <p class="tip">Durante la demo, usa el botón de pánico ya ejecutado. La diapositiva 12 explica el camino automático ante una validación fallida.</p>
 
   <footer><span>PROYECTO FINAL · CI/CD</span><span>08 / 08</span></footer>
 </section></main></body>
